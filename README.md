@@ -60,4 +60,28 @@ In the `data` key of the secret manifest, a base64 encoded value exists which co
 ```bash
 echo 'base64 value in secret' | base64 --decode
 ```
-These passwords could be manually copied and pasted into the `values.yaml`. This would be painfully tedious, since there are many passwords.
+These passwords could be manually copied and pasted into the `values.yaml` that is inside the `helm` directly, but this is tedious and may result in errors. A slightly better solution would be to convert the decoded passwords from JSON to YAML (call it `password-values.yaml` and save it in the current working directory). In this YAML file, add yourself as a user and add the DNS name of your machine, e.g.
+```yaml
+host: cloud08.core.wits.ac.za
+users:
+  regan:
+    password: "YourOwnPassword"
+```
+and then run the following commands:
+```bash
+helm dependency update helm/chipster
+helm install chipster helm/chipster -f password-values.yaml
+```
+There might be some issues regarding the default `traefik` ingress controller that **K3s** uses. If an error is encountered that mentions missing CRDs (custom resource definitions), then those `traefik` CRDs need to be manually installed onto the cluster. Inside this repository, there exists a `traefik` directory which contains several `traefik` manifests. The following manifests should be applied:
+```bash
+kubectl apply -f 001-crd.yaml
+kubectl apply -f 001-rbac.yaml
+kubectl apply -f 004-service.yaml
+kubectl apply -f 005-deployment.yaml
+```
+After these `traefik` resources have been created, the Helm deployment should work as expected. After a few minutes, we should see that the `chipster` pods are up and running:
+```bash
+kubectl get pods
+```
+![Chipster Pods](public/assets/images/chipster-pods.png "Chipster Pods")     
+
