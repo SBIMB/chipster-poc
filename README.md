@@ -28,7 +28,7 @@ sudo chmod a+x /usr/local/bin/yq
 ```
 To verify that the installation was successful, run:
 ```bash
-yp --version
+yq --version
 ```
 To install `diceware`, run:
 ```bash
