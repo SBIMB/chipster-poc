@@ -5,6 +5,8 @@ The installation script for K3s, with default load balancer `servicelb` (also kn
 ```bash
 sudo curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644
 ```
+If using a single node to run the `k3s` cluster without an external load balancer already set up, it is highly recommended to disable the default internal load balancer, `servicelb`, and instead use [metallb](https://metallb.universe.tf/). Instructions for installing `metallb` can be found in this repository over [here](./using_metallb_as_load_balancer.md).   
+
 The installation includes additional utilities such as `kubectl`, `crictl`, `ctr`, `k3s-killall.sh`, and `k3s-uninstall.sh`. `kubectl` will automatically use the `kubeconfig` file that gets written to `/etc/rancher/k3s/k3s.yaml` after the installation. By default, the container runtime that K3s uses is `containerd`.    
 
 Docker is not needed, but can be installed if desired. To use Docker as the container runtime, the following command should be run:

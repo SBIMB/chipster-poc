@@ -62,7 +62,7 @@ echo 'base64 value in secret' | base64 --decode
 ```
 These passwords could be manually copied and pasted into the `values.yaml` that is inside the `helm` directly, but this is tedious and may result in errors. A slightly better solution would be to convert the decoded passwords from JSON to YAML (call it `password-values.yaml` and save it in the current working directory). In this YAML file, add yourself as a user and add the DNS name of your machine, e.g.
 ```yaml
-host: cloud08.core.wits.ac.za
+host: cloud05.core.wits.ac.za
 users:
   regan:
     password: "YourOwnPassword"
@@ -72,6 +72,9 @@ and then run the following commands:
 helm dependency update helm/chipster
 helm install chipster helm/chipster -f password-values.yaml
 ```
+After the Helm deployment, the following message (or something very similar) should be displayed:   
+![Chipster Helm Deployment](public/assets/images/chipster-helm-deployment.png "Chipster Helm Deployment")     
+
 There might be some issues regarding the default `traefik` ingress controller that **K3s** uses. If an error is encountered that mentions missing CRDs (custom resource definitions), then those `traefik` CRDs need to be manually installed on the cluster.    
 
 Inside this repository, there exists a `traefik` directory which contains several `traefik` manifests. The following manifests should be applied:
@@ -86,4 +89,12 @@ After these `traefik` resources have been created, the Helm deployment should wo
 kubectl get pods
 ```
 ![Chipster Pods](public/assets/images/chipster-pods.png "Chipster Pods")     
+
+When all the pods are up and running, the Chipster web UI should be accessible on the IP address of the node, e.g.
+```bash
+curl http://<nodeIPAddress>
+```
+![Chipster Web UI](public/assets/images/chipster-web-ui.png "Chipster Web UI")     
+
+To make full use of all the Chipster services, the [tools-bin](https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md#download-the-tools-bin-package) package needs to be downloaded and installed. This package is about 500Gb in size, so resource-intensive machine would be needed for such an installation.
 
