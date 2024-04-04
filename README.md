@@ -4,7 +4,7 @@
 This repository contains all configuration and manifest files for the installation or deployment of [chipster](https://github.com/chipster/chipster-openshift/tree/k3s) on our K3s cluster (the K3s cluster is currently hosting the [Gen3](https://github.com/sbimb/gen3-dev) workloads).
 
 ## Setup of Chipster
-The instructions for installing `chipster` can be found in [their repository](https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md). However, there are some subtle differences in our case, since we already have a K3s cluster running on bare-metal Ubuntu. The rest of this README will assume there is a K3s cluster already running with `helm` and `kubectl` already installed, as well as the Linux `apt` package manager.      
+The instructions for installing `chipster` can be found in [their repository](https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md). However, there are some subtle differences in our case, since we already have a K3s cluster running on bare-metal Ubuntu. The rest of this README will assume there is a K3s cluster already running with `helm` and `kubectl` already installed, as well as the Linux `apt` package manager. However, instructions for installing `k3s` and `helm` can be found in the [documentation directory](documentation/setting_up_k3s_on_ubuntu.md) of this repository.      
 
 Firstly, we need to have some prerequisites installed on our Ubuntu machine, namely:
 - [ansible](https://docs.ansible.com/)
