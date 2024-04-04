@@ -92,9 +92,9 @@ kubectl get pods
 
 When all the pods are up and running, the Chipster web UI should be accessible on the IP address of the node, e.g.
 ```bash
-curl http://<nodeIPAddress>
+curl http://<nodeIPAddress>/home
 ```
 ![Chipster Web UI](public/assets/images/chipster-web-ui.png "Chipster Web UI")     
 
-To make full use of all the Chipster services, the [tools-bin](https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md#download-the-tools-bin-package) package needs to be downloaded and installed. This package is about 500Gb in size, so resource-intensive machine would be needed for such an installation.
+To make full use of all the Chipster services, the [tools-bin](https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md#download-the-tools-bin-package) package needs to be downloaded and installed. This package is about 500GB in size, so a resource-intensive machine would be needed for such an installation.
 
