@@ -126,7 +126,7 @@ cd ..
 sudo apt install -y liblz4-tool
 
 # extract packages 
-for f in temp/*.tar.lz4; do lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.5.2; done
+for f in temp/*.tar.lz4; do lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.9.0; done
 
 # remove packages
 rm -rf temp
