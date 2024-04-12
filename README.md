@@ -96,5 +96,46 @@ curl http://<nodeIPAddress>/home
 ```
 ![Chipster Web UI](public/assets/images/chipster-web-ui.png "Chipster Web UI")     
 
-To make full use of all the Chipster services, the [tools-bin](https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md#download-the-tools-bin-package) package needs to be downloaded and installed. This package is about 500GB in size, so a resource-intensive machine would be needed for such an installation.
+To make full use of all the Chipster services, the [tools-bin](https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md#download-the-tools-bin-package) package needs to be downloaded and installed. This package is about 500GB in size, so a resource-intensive machine would be needed for such an installation.   
+
+Suppose we have a file system (with logical volume) mounted at directory `/chipster_tools`, then we can install the latest `tools-bin` package in that directory. The latest version of `tools-bin` can be found over [here](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). As of typing this, the most recent version of the `tools-bin` package is version 4.9.0, so we create a directory inside the volume `/chipster_tools` as follows:
+```bash
+sudo mkdir -p /chipster_tools/tools-bin/chipster-4.9.0
+```
+The `password-values.yaml` needs to be updated to include the `tools-bin` configuration:
+```yaml
+toolsBin:
+  version: chipster-4.9.0
+  hostPath: /chipster_tools/tools-bin
+```
+and then a new deployment needs to be performed with:
+```bash
+# make a temporary directory for the download packages
+cd /chipster_tools
+sudo mkdir temp
+sudo chown $(whoami) temp
+cd temp
+
+# get a list of packages
+curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/ | grep chipster-4.9.0 | grep .tar.lz4$ > files.txt
+# download packages
+for f in $(cat files.txt); do wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$f; done
+cd ..
+
+# install lz4
+sudo apt install -y liblz4-tool
+
+# extract packages 
+for f in temp/*.tar.lz4; do lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.5.2; done
+
+# remove packages
+rm -rf temp
+```
+All the pods need to be restarted so that all the tools that were disabled before the installation can now be enabled.
+
+```bash
+cd ~/workspace/chipster-openshift/k3s/
+bash restart.bash
+watch kubectl get pod
+```
 
