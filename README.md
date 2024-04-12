@@ -101,6 +101,7 @@ To make full use of all the Chipster services, the [tools-bin](https://github.co
 Suppose we have a file system (with logical volume) mounted at directory `/chipster_tools`, then we can install the latest `tools-bin` package in that directory. The latest version of `tools-bin` can be found over [here](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). As of typing this, the most recent version of the `tools-bin` package is version 4.9.0, so we create a directory inside the volume `/chipster_tools` as follows:
 ```bash
 sudo mkdir -p /chipster_tools/tools-bin/chipster-4.9.0
+sudo chown -R $(whoami) /chipster_tools/tools-bin/chipster-4.9.0
 ```
 The `password-values.yaml` needs to be updated to include the `tools-bin` configuration:
 ```yaml
@@ -113,7 +114,7 @@ and then a new deployment needs to be performed with:
 # make a temporary directory for the download packages
 cd /chipster_tools
 sudo mkdir temp
-sudo chown $(whoami) temp
+sudo chown -R $(whoami) temp
 cd temp
 
 # get a list of packages
