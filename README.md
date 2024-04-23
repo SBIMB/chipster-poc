@@ -98,27 +98,27 @@ curl http://<nodeIPAddress>/home
 
 To make full use of all the Chipster services, the [tools-bin](https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md#download-the-tools-bin-package) package needs to be downloaded and installed. This package is about 500GB in size, so a resource-intensive machine would be needed for such an installation.   
 
-Suppose we have a file system (with logical volume) mounted at directory `/chipster_tools`, then we can install the latest `tools-bin` package in that directory. The latest version of `tools-bin` can be found over [here](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). As of typing this, the most recent version of the `tools-bin` package is version 4.9.0, so we create a directory inside the volume `/chipster_tools` as follows:
+Suppose we have a file system (with logical volume) mounted at directory `/mnt/data`, then we can install the latest `tools-bin` package in that directory. The latest version of `tools-bin` can be found over [here](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). As of typing this, the most recent version of the `tools-bin` package is version 4.9.0, but we'll use version 4.5.2. We create a directory inside the volume `/mnt/data` as follows:
 ```bash
-sudo mkdir -p /chipster_tools/tools-bin/chipster-4.9.0
-sudo chown -R $(whoami) /chipster_tools/tools-bin/chipster-4.9.0
+sudo mkdir -p /mnt/data/tools-bin/chipster-4.5.2
+sudo chown -R $(whoami) /mnt/data/tools-bin/chipster-4.5.2
 ```
 The `password-values.yaml` needs to be updated to include the `tools-bin` configuration:
 ```yaml
 toolsBin:
-  version: chipster-4.9.0
-  hostPath: /chipster_tools/tools-bin
+  version: chipster-4.5.2
+  hostPath: /mnt/data/tools-bin
 ```
 and then a new deployment needs to be performed with:
 ```bash
 # make a temporary directory for the download packages
-cd /chipster_tools
+cd /mnt/data
 sudo mkdir temp
 sudo chown -R $(whoami) temp
 cd temp
 
 # get a list of packages
-curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/ | grep chipster-4.9.0 | grep .tar.lz4$ > files.txt
+curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/ | grep chipster-4.5.2 | grep .tar.lz4$ > files.txt
 # download packages
 for f in $(cat files.txt); do wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$f; done
 cd ..
@@ -127,9 +127,27 @@ cd ..
 sudo apt install -y liblz4-tool
 
 # extract packages 
-for f in temp/*.tar.lz4; do lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.9.0; done
+for f in temp/*.tar.lz4; do sudo lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.5.2; done
+for f in temp/*.tar.lz4; do echo $f; done
+for f in $(cat files.txt); do lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.5.2; done
+for i in *tar.gz; do tar -xvf "$i" -C "/path/to/new/folder" "*.vcf.gz";    # Use -C to switch directory before extract and put extension to search for in tar file in quotes.
+done
 
-# remove packages
+# If there are permission issues when implementing the 'for loop' above, then each .tar.lz4 file should be extracted individually (this is tedious, but effective)
+lz4 -d temp/BBMap_38.94_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+lz4 -d temp/BaseSpace_cli-0.10.7_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+lz4 -d temp/Drop-seq_tools-1.12_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+lz4 -d temp/EMBOSS-6.5.7-20.04_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+lz4 -d temp/EMBOSS-6.5.7_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+lz4 -d temp/Python-2.7.12_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+lz4 -d temp/Python-2.7.12_part_001.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+lz4 -d temp/QDNAseq_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+lz4 -d temp/R-3.2.3_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+lz4 -d temp/R-3.2.3_part_001.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+lz4 -d temp/R-3.2.3_part_002.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+lz4 -d temp/R-3.2.3_part_003.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+
+# after all the packages have been successfully extracted, they can be removed
 rm -rf temp
 ```
 All the pods need to be restarted so that all the tools that were disabled before the installation can now be enabled.
@@ -140,3 +158,4 @@ bash restart.bash
 watch kubectl get pod
 ```
 
+kubectl delete -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/v3.5.0/deploy/crds.yaml
