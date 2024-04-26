@@ -128,24 +128,6 @@ sudo apt install -y liblz4-tool
 
 # extract packages 
 for f in temp/*.tar.lz4; do sudo lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.5.2; done
-for f in temp/*.tar.lz4; do echo $f; done
-for f in $(cat files.txt); do lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.5.2; done
-for i in *tar.gz; do tar -xvf "$i" -C "/path/to/new/folder" "*.vcf.gz";    # Use -C to switch directory before extract and put extension to search for in tar file in quotes.
-done
-
-# If there are permission issues when implementing the 'for loop' above, then each .tar.lz4 file should be extracted individually (this is tedious, but effective)
-lz4 -d temp/BBMap_38.94_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
-lz4 -d temp/BaseSpace_cli-0.10.7_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
-lz4 -d temp/Drop-seq_tools-1.12_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
-lz4 -d temp/EMBOSS-6.5.7-20.04_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
-lz4 -d temp/EMBOSS-6.5.7_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
-lz4 -d temp/Python-2.7.12_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
-lz4 -d temp/Python-2.7.12_part_001.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
-lz4 -d temp/QDNAseq_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
-lz4 -d temp/R-3.2.3_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
-lz4 -d temp/R-3.2.3_part_001.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
-lz4 -d temp/R-3.2.3_part_002.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
-lz4 -d temp/R-3.2.3_part_003.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
 
 # after all the packages have been successfully extracted, they can be removed
 rm -rf temp
@@ -158,4 +140,12 @@ bash restart.bash
 watch kubectl get pod
 ```
 
-kubectl delete -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/v3.5.0/deploy/crds.yaml
+It might be necessary to create a symlink for the location of the tools. This is because different implementations of Chipster have their tools installed in the `/opt/chipster/tools` directory instead of the `/mnt/data/tools-bin` directory.
+```bash
+sudo mkdir -p /opt/chipster/tools
+sudo chown -R $(whoami) /opt/chipster
+```
+The symlink can then be created as follows:
+```bash
+ln -s /mnt/data/tools-bin/chipster-4.5.2 /opt/chipster/tools
+```
