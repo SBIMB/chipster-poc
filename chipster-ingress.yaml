@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chipster-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: cloud05.core.wits.ac.za
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-server
+            port:
+              number: 80
