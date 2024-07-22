@@ -5,9 +5,18 @@ The installation script for K3s, with default load balancer `servicelb` (also kn
 ```bash
 sudo curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644
 ```
-If using a single node to run the `k3s` cluster without an external load balancer already set up, it is highly recommended to disable the default internal load balancer, `servicelb`, and instead use [metallb](https://metallb.universe.tf/). Instructions for installing `metallb` can be found in this repository over [here](./using_metallb_as_load_balancer.md).   
+If using a single node to run the `k3s` cluster without an external load balancer already set up, it is highly recommended to disable the default internal load balancer, `servicelb`, and instead use [metallb](https://metallb.universe.tf/). Instructions for installing `metallb` can be found over [here](./using_metallb_as_load_balancer.md). To install `k3s` without `servicelb` and `traefik`, run the following command:   
+```bash
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable servicelb --disable traefik" sh -s - --write-kubeconfig-mode 644
+```   
+In place of the `traefik` ingress, we could instead use `nginx`. Details on installing the NGINX ingress controller can be found over [here](./installing_nginx_ingress_controller.md).   
 
-The installation includes additional utilities such as `kubectl`, `crictl`, `ctr`, `k3s-killall.sh`, and `k3s-uninstall.sh`. `kubectl` will automatically use the `kubeconfig` file that gets written to `/etc/rancher/k3s/k3s.yaml` after the installation. By default, the container runtime that K3s uses is `containerd`.    
+However, it is advisable to keep the default `traefik` ingress controller for Chipster. So the command for installing `k3s` becomes:
+```bash
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable servicelb" sh -s - --write-kubeconfig-mode 644
+```
+
+The `k3s` installation includes additional utilities such as `kubectl`, `crictl`, `ctr`, `k3s-killall.sh`, and `k3s-uninstall.sh`. `kubectl` will automatically use the `kubeconfig` file that gets written to `/etc/rancher/k3s/k3s.yaml` after the installation. By default, the container runtime that K3s uses is `containerd`.    
 
 Docker is not needed, but can be installed if desired. To use Docker as the container runtime, the following command should be run:
 ```bash

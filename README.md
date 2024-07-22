@@ -75,6 +75,11 @@ helm install chipster helm/chipster -f password-values.yaml
 After the Helm deployment, the following message (or something very similar) should be displayed:   
 ![Chipster Helm Deployment](public/assets/images/chipster-helm-deployment.png "Chipster Helm Deployment")     
 
+If ever there is a need to update or change values in the `password-values.yaml`, the following `helm` command can be used:
+```bash
+helm upgrade --reuse-values -f password-values.yaml chipster helm/chipster
+```
+
 There might be some issues regarding the default `traefik` ingress controller that **K3s** uses. If an error is encountered that mentions missing CRDs (custom resource definitions), then those `traefik` CRDs need to be manually installed on the cluster.    
 
 Inside this repository, there exists a `traefik` directory which contains several `traefik` manifests. The following manifests should be applied:
