@@ -71,6 +71,8 @@ and then run the following commands:
 ```bash
 helm dependency update helm/chipster
 helm install chipster helm/chipster -f password-values.yaml
+helm install chipster helm/chipster -f my-values.yaml
+helm install chipster helm/chipster -f new-values.yaml
 ```
 After the Helm deployment, the following message (or something very similar) should be displayed:   
 ![Chipster Helm Deployment](public/assets/images/chipster-helm-deployment.png "Chipster Helm Deployment")     
@@ -105,19 +107,19 @@ To make full use of all the Chipster services, the [tools-bin](https://github.co
 
 Suppose we have a file system (with logical volume) mounted at directory `/mnt/data`, then we can install the latest `tools-bin` package in that directory. The latest version of `tools-bin` can be found over [here](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). As of typing this, the most recent version of the `tools-bin` package is version 4.9.0, but we'll use version 4.5.2. We create a directory inside the volume `/mnt/data` as follows:
 ```bash
-sudo mkdir -p /mnt/data/tools-bin/chipster-4.5.2
-sudo chown -R $(whoami) /mnt/data/tools-bin/chipster-4.5.2
+sudo mkdir -p /mnt/data/chipster/tools-bin/chipster-4.5.2
+sudo chown -R $(whoami) /mnt/data/chipster/tools-bin/chipster-4.5.2
 ```
 The `password-values.yaml` needs to be updated to include the `tools-bin` configuration:
 ```yaml
 toolsBin:
   version: chipster-4.5.2
-  hostPath: /mnt/data/tools-bin
+  hostPath: /mnt/data/chipster/tools-bin
 ```
 and then a new deployment needs to be performed with:
 ```bash
 # make a temporary directory for the download packages
-cd /mnt/data
+cd /mnt/data/chipster
 sudo mkdir temp
 sudo chown -R $(whoami) temp
 cd temp
@@ -145,12 +147,12 @@ bash restart.bash
 watch kubectl get pod
 ```
 
-It might be necessary to create a symlink for the location of the tools. This is because different implementations of Chipster have their tools installed in the `/opt/chipster/tools` directory instead of the `/mnt/data/tools-bin` directory.
+It might be necessary to create a symlink for the location of the tools. This is because different implementations of Chipster have their tools installed in the `/opt/chipster/tools` directory instead of the `/mnt/data/chipster/tools-bin` directory.
 ```bash
 sudo mkdir -p /opt/chipster/tools
 sudo chown -R $(whoami) /opt/chipster
 ```
 The symlink can then be created as follows:
 ```bash
-ln -s /mnt/data/tools-bin/chipster-4.5.2 /opt/chipster/tools
+ln -s /mnt/data/chipster/tools-bin/chipster-4.5.2 /opt/chipster/tools
 ```

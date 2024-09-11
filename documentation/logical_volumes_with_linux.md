@@ -36,16 +36,14 @@ sudo mkfs.xfs /dev/chipster/chipster_tools_lv
 ```
 ![Chipster Tools XFS File System](/public/assets/images/chipster-tools-file-system.png "Chipster Tools XFS File System")    
 
-Now we'd like to mount this file system to a directory on our Linux machine. First, we create a new directory called `chipster_tools`,
+Now we'd like to mount this file system to a directory on our Linux machine. First, we create a new directory called `chipster`,
 ```bash
-mkdir /chipster_tools
-sudo mkdir -p /mnt/data/tools-bin/chipster-4.5.2
-sudo chown $(whoami) /mnt/data/tools-bin/chipster-4.5.2
+sudo mkdir -p /mnt/data/chipster
+sudo chown $(whoami) /mnt/data/chipster
 ```
 and then we mount the file system as follows:
 ```bash
-sudo mount /dev/chipster/chipster_tools_lv /chipster_tools   
-sudo mount /dev/chipster/chipster_tools_lv /mnt/data/tools-bin/chipster-4.5.2  
+sudo mount /dev/chipster/chipster_tools_lv /mnt/data/chipster
 ```
 ![Mounted Chipster Tools Directory](/public/assets/images/mounted-chipster-tools-directory.png "Mounted Chipster Tools Directory")     
 
