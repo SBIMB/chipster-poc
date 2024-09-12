@@ -147,6 +147,23 @@ bash restart.bash
 watch kubectl get pod
 ```
 
+If any of the installed tools are outdated or behaving poorly, a more direct download and installation can be performed by downloading specific _.tar.lz_ files and unzipping them, i.e. for downloading the latest version of R-3.2.3,
+```bash
+cd /mnt/data/chipster/temp
+wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/chipster-4.9.0/parts/R-3.2.3_part_000.tar.lz4
+wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/chipster-4.9.0/parts/R-3.2.3_part_001.tar.lz4
+wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/chipster-4.9.0/parts/R-3.2.3_part_002.tar.lz4
+wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/chipster-4.9.0/parts/R-3.2.3_part_003.tar.lz4
+```
+Then one level above the `temp` folder, run the following for each part of the package:
+```bash
+sudo lz4 -d temp/R-3.2.3_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.5.2
+sudo lz4 -d temp/R-3.2.3_part_001.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.5.2
+sudo lz4 -d temp/R-3.2.3_part_002.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.5.2
+sudo lz4 -d temp/R-3.2.3_part_003.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.5.2
+```
+(This last section can be done in a FOR loop).
+
 It might be necessary to create a symlink for the location of the tools. This is because different implementations of Chipster have their tools installed in the `/opt/chipster/tools` directory instead of the `/mnt/data/chipster/tools-bin` directory.
 ```bash
 sudo mkdir -p /opt/chipster/tools
@@ -154,5 +171,5 @@ sudo chown -R $(whoami) /opt/chipster
 ```
 The symlink can then be created as follows:
 ```bash
-ln -s /mnt/data/chipster/tools-bin/chipster-4.5.2 /opt/chipster/tools
+sudo ln -s /mnt/data/chipster/tools-bin/chipster-4.5.2/* /opt/chipster/tools
 ```
