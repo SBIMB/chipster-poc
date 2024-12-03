@@ -46,11 +46,34 @@ and then we mount the file system as follows:
 sudo mount /dev/chipster/chipster_tools_lv /mnt/data/chipster
 ```
 ![Mounted Chipster Tools Directory](/public/assets/images/mounted-chipster-tools-directory.png "Mounted Chipster Tools Directory")     
+To ensure that the file system does _not_ get unmounted when the system is rebooted, we should update the `/etc/fstab` configuration file with the relevant data in the format:
+```bash
+<file system> <mount point> <type> <options> <dump> <pass>
+```
+We can get some of this information by running the command:
+```
+df -kHT
+```
+and looking at the different columns in the output table. In our case above, the `/etc/fstab` should be updated with the following:
+```bash
+/dev/mapper/chipster-chipster_tools_lv /mnt/data/chipster xfs defaults 0 2
+```
+The `dump` parameter is used by the dump utility to decide if the file system should be backed up. The key-value pairs are:   
+
+- 0: Do not back up the file system
+- 1: Back up the file system during `dump`   
+
+The `pass` parameter determines the order in which the file systems get checked during boot or reboot. The key-value pairs are:   
+
+- 0: Do not check the file system
+- 1: Check file system first (common for root file systems)
+- 2: Check file system after the root file system   
 
 If ever required, we can extend the size of the logical volume by using the `lvextend` command. We can extend it by a percentage (let's say `50%`) of the free space inside the volume group, e.g.
 ```bash
 lvextend -l +50%FREE /dev/chipster/chipster_tools_lv
 ```
+For session storage (i.e., when Chipster jobs are being run), we should create a directory called `/mnt/data/chipster/file-storage` and ensure that this path is specified in the relevant pod or deployment manifest (the `file-storage` pod).
 
 ### Removing A Logical Volume
 To remove a logical volume from a volume group, the first step is to unmount the file system with the `umount` command:
