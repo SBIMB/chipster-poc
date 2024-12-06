@@ -80,6 +80,7 @@ After the Helm deployment, the following message (or something very similar) sho
 If ever there is a need to update or change values in the `password-values.yaml`, the following `helm` command can be used:
 ```bash
 helm upgrade --reuse-values -f password-values.yaml chipster helm/chipster
+helm upgrade --reuse-values -f values.yaml chipster helm/chipster --dry-run
 ```
 
 There might be some issues regarding the default `traefik` ingress controller that **K3s** uses. If an error is encountered that mentions missing CRDs (custom resource definitions), then those `traefik` CRDs need to be manually installed on the cluster.    
@@ -105,18 +106,19 @@ curl http://<nodeIPAddress>/home
 
 To make full use of all the Chipster services, the [tools-bin](https://github.com/chipster/chipster-openshift/blob/k3s/k3s/README.md#download-the-tools-bin-package) package needs to be downloaded and installed. This package is about 500GB in size, so a resource-intensive machine would be needed for such an installation.   
 
-Suppose we have a file system (with logical volume) mounted at directory `/mnt/data`, then we can install the latest `tools-bin` package in that directory. The latest version of `tools-bin` can be found over [here](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). As of typing this, the most recent version of the `tools-bin` package is version 4.9.0, but we'll use version 4.5.2. We create a directory inside the volume `/mnt/data` as follows:
+Suppose we have a file system (with logical volume) mounted at directory `/mnt/data`, then we can install the latest `tools-bin` package in that directory. The latest version of `tools-bin` can be found over [here](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/). As of typing this, the most recent version of the `tools-bin` package is version 4.9.0, and so we'll use version 4.9.0. We create a directory inside the volume `/mnt/data/chipster` as follows:
 ```bash
-sudo mkdir -p /mnt/data/chipster/tools-bin/chipster-4.5.2
-sudo chown -R $(whoami) /mnt/data/chipster/tools-bin/chipster-4.5.2
+sudo mkdir -p /mnt/data/chipster/tools-bin/chipster-4.9.0
+sudo chown -R $(whoami) /mnt/data/chipster/tools-bin/chipster-4.9.0
 ```
 The `password-values.yaml` needs to be updated to include the `tools-bin` configuration:
 ```yaml
 toolsBin:
-  version: chipster-4.5.2
+  version: chipster-4.9.0
   hostPath: /mnt/data/chipster/tools-bin
 ```
-and then a new deployment needs to be performed with:
+We can get a list of packages or tools from [here](https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/chipster-4.9.0/parts/files.txt). These packages or tools will be downloaded into a `temp` directory and then installed into `/mnt/data/chipster/tools-bin/chipster-4.9.0`.
+
 ```bash
 # make a temporary directory for the download packages
 cd /mnt/data/chipster
@@ -125,7 +127,7 @@ sudo chown -R $(whoami) temp
 cd temp
 
 # get a list of packages
-curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/ | grep chipster-4.5.2 | grep .tar.lz4$ > files.txt
+curl -s https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/ | grep chipster-4.9.0 | grep .tar.lz4$ > files.txt
 # download packages
 for f in $(cat files.txt); do wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/$f; done
 cd ..
@@ -134,8 +136,8 @@ cd ..
 sudo apt install -y liblz4-tool
 
 # extract packages 
-for f in temp/*.tar.lz4; do sudo lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.5.2; done
-
+for f in temp/*.tar.lz4; do sudo lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.9.0; done
+for f in temp/chipster-4.9.0-packages/*.tar.lz4; do sudo lz4 -d $f -c - | tar -x -C tools-bin/chipster-4.9.0; done
 # after all the packages have been successfully extracted, they can be removed
 rm -rf temp
 ```
@@ -157,12 +159,13 @@ wget https://a3s.fi/swift/v1/AUTH_chipcld/chipster-tools-bin/chipster-4.9.0/part
 ```
 Then one level above the `temp` folder, run the following for each part of the package:
 ```bash
-sudo lz4 -d temp/R-3.2.3_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.5.2
-sudo lz4 -d temp/R-3.2.3_part_001.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.5.2
-sudo lz4 -d temp/R-3.2.3_part_002.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.5.2
-sudo lz4 -d temp/R-3.2.3_part_003.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.5.2
+sudo lz4 -d temp/R-3.2.3_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+sudo lz4 -d temp/R-3.2.3_part_001.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+sudo lz4 -d temp/R-3.2.3_part_002.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
+sudo lz4 -d temp/R-3.2.3_part_003.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
 ```
 (This last section can be done in a FOR loop).
+sudo lz4 -d temp/seurat_part_000.tar.lz4 -c - | tar -x -C tools-bin/chipster-4.9.0
 
 It might be necessary to create a symlink for the location of the tools. This is because different implementations of Chipster have their tools installed in the `/opt/chipster/tools` directory instead of the `/mnt/data/chipster/tools-bin` directory.
 ```bash
@@ -171,5 +174,54 @@ sudo chown -R $(whoami) /opt/chipster
 ```
 The symlink can then be created as follows:
 ```bash
-sudo ln -s /mnt/data/chipster/tools-bin/chipster-4.5.2/* /opt/chipster/tools
+sudo ln -s /mnt/data/chipster/tools-bin/chipster-4.9.0/* /opt/chipster/tools
+```
+Some tools are not included in the `tools-bin`. For these tools, there are instructions for building the relevant Docker image and modifying the `values.yaml` file. The documentation for this can be found over here and here. We'll demonstrate a way in which we installed the tool, Cellbender. Firstly, we need to enter the `comp-shell` container by running the following script:
+```bash
+bash bash/comp-shell.bash
+```
+Once inside the container, we need to install a few container-wide libraries:
+```bash
+apt-get update
+apt-get install -y libssl-dev libffi-dev libbz2-dev liblzma-dev
+```
+Once these libraries have been installed or updated, we then need to install Python v3.7.17 and then install the Cellbender package:
+```bash
+# cellbender works only in Python 3.7
+wget https://www.python.org/ftp/python/3.7.17/Python-3.7.17.tgz
+tar -xzf Python-3.7.17.tgz 
+cd Python-3.7.17
+
+# we can install the tool in /mnt/data/chipster/tools-bin/chipster-4.9.0/python-3.7.17 or /opt/chipster/tools-bin/python-3.7.17
+
+#installation in /mnt/data/chipster/tools-bin/chipster-4.9.0/python-3.7.17:
+./configure --prefix=/mnt/data/chipster/tools-bin/chipster-4.9.0/python-3.7.17
+make
+make install
+cd /mnt/data/chipster/tools-bin/chipster-4.9.0/python-3.7.17
+bin/pip3 install cellbender==v0.3.0
+bin/cellbender --version
+
+#installation in /opt/chipster/tools-bin/python-3.7.17:
+./configure --prefix=/opt/chipster/tools-bin/python-3.7.17
+make
+make install
+cd /opt/chipster/tools-bin/python-3.7.17
+bin/pip3 install cellbender==v0.3.0
+bin/cellbender --version
+
+```
+After running `bin/cellbender --version`, the output should be `0.3.0`. This means the tool has been successfully installed. However, we need to modify the `values.yaml` file by adding:
+```yaml
+toolbox:
+  configs:
+    toolbox-runtime-command-R-4.2.3-cellbender: /opt/chipster/tools/R-4.2.3/bin/R
+    toolbox-runtime-image-R-4.2.3-cellbender: comp-r-4-2-3-cellbender
+    toolbox-runtime-tools-bin-path-R-4.2.3-cellbender: tools-bin
+```
+Finally, a redeployment can be done and the `toolbox` deployment should be restarted so that it can read the modified configurations:
+```bash
+bash deploy.bash -f ~/values.yaml
+kubectl rollout restart deployment/toolbox
+kubectl logs deployment/toolbox --follow
 ```

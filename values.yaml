@@ -1,346 +1,84 @@
-# Default values for Chipster Helm chart
-# This is a YAML-formatted file.
-# Declare variables to be passed into the templates.
-
-# deployments defines all Chipster services
-# generate-passwords.bash will generate all deployments.*.password fields
+host: 146.141.240.75
 deployments:
-  # keys written in camelCase to make them easier to use in templates
-  webServer:
-    # name is the Chipster service name in its usual dash-separated form
-    name: web-server
-    # class to start if using chipster-web-server image
-    class: ""
-    # image is the name of the container image
-    image: web-server
-    # apiPort is the port which the process binds to serve API requests
-    apiPort: 8000
-    # adminPort is the port which the process binds to serve admin requests
-    adminPort: 8100
-    # eventsPort is the port which the process binds to serve WebSocket connections
-    eventsPort: ""
-    # workDir is the working directory in container where the process is started
-    workDir: /opt/chipster
-    # password is used by a Chipster service to authenticate to the auth service
-    password: "ILEp/r4qclEAKIlrtXbicBBoWXRlyuVs5mXHUhfY"
-    # configs is a YAML map to pass configuration key-value pairs to the Chipster service
-    configs: {}
-    # replicas is the number of containers that run this service
-    replicas: ""
-    # enableAdminRoute decides whether an IngressRoute is created for the admin port/service, allowing requests from outside of the K3s. Set to "default", "enable" or "disable".
-    adminRoute: "default"
-    # conf is a YAML map where you can add new files to the conf directory
-    conf: {}
-    # env is a YAML map for setting environment variables
-    env: {}
   auth:
-    name: auth
-    class: fi.csc.chipster.auth.AuthenticationService
-    image: chipster-web-server
-    apiPort: 8002
-    adminPort: 8102
-    eventsPort: ""
-    workDir: /opt/chipster
-    password: "m1+coXc8JRNL+dyuTfHvSnzqQTcsC00qg3JLJ2UB"
-    configs:
-    # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
-    db-fallback: false
-    replicas: ""
-    adminRoute: "default"
-    conf: {}
-    env: {}
-  serviceLocator:
-    name: service-locator
-    class: fi.csc.chipster.servicelocator.ServiceLocator
-    image: chipster-web-server
-    apiPort: 8003
-    adminPort: 8103
-    eventsPort: ""
-    workDir: /opt/chipster
-    password: "R+67R4Q64tqXSkUK3klb8eyaVwjd4wipSGLMMd1u"
-    configs: {}
-    replicas: ""
-    adminRoute: "default"
-    conf: {}
-    env: {}
-  sessionDb:
-    name: session-db
-    class: fi.csc.chipster.sessiondb.SessionDb
-    image: chipster-web-server
-    apiPort: 8004
-    adminPort: 8104
-    eventsPort: 8005
-    workDir: /opt/chipster
-    password: "yQy+8Lk04lGdvt0bKRk+q5BRU4sVVZIHcAK25j5z"
-    configs:
-    # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
-    db-fallback: false
-    replicas: ""
-    adminRoute: "default"
-    conf: {}
-    env: {}
-  scheduler:
-    name: scheduler
-    class: fi.csc.chipster.scheduler.Scheduler
-    image: chipster-web-server
-    apiPort: 8006
-    adminPort: 8106
-    eventsPort: ""
-    workDir: /opt/chipster
-    password: "IcRtDlR3Pln1DeKlXeXcRnX4XXCtsZqnOrhrzCuo"
-    configs: {}
-    replicas: ""
-    adminRoute: "default"
-    conf: {}
-    env: {}
-  fileBroker:
-    name: file-broker
-    class: fi.csc.chipster.filebroker.FileBroker
-    image: chipster-web-server
-    apiPort: 8007
-    adminPort: 8107
-    eventsPort: ""
-    workDir: /opt/chipster
-    password: "R3Z/uahA8n2dJszqwFkpZUkWAAxwiejC3cW1OZ1E"
-    configs: {}
-    replicas: ""
-    adminRoute: "default"
-    conf: {}
-    env: {}
-  fileStorage:
-    name: file-storage
-    class: fi.csc.chipster.filestorage.FileStorage
-    image: chipster-web-server
-    apiPort: 8016
-    adminPort: 8116
-    eventsPort: ""
-    workDir: /opt/chipster
-    password: "aWBDQG9+i30Qozy3DcZ4rvV2ns7fUZqWgHBkJFWX"
-    # storageHostPath is the hostPath to store users' files. PVC is used when this is not set.
-    storageHostPath: ""
-    # storageVolumeSize is the maximum total size of users' files (although K3s Local Storage Provider probably doesn't enforce it)
-    storageVolumeSize: 300Gi
-    storageClassName: ""
-    configs: {}
-    replicas: ""
-    adminRoute: "default"
-    conf: {}
-    env: {}
-  toolbox:
-    name: toolbox
-    class: ""
-    image: toolbox
-    apiPort: 8008
-    adminPort: 8108
-    eventsPort: ""
-    # workDir of toolbox is different, because of the clash of /opt/chipster/tools (tools-bin) and toolbox/tools (tool scripts) directories
-    workDir: /opt/chipster/toolbox
-    password: "WpKw/r85AgMznudTqOk+2Romevtsym2qlroDUawf"
-    configs: {}
-    replicas: ""
-    adminRoute: "default"
-    conf: {}
-    env: {}
-  sessionWorker:
-    name: session-worker
-    class: fi.csc.chipster.sessionworker.SessionWorker
-    image: chipster-web-server
-    apiPort: 8009
-    adminPort: 8109
-    eventsPort: ""
-    workDir: /opt/chipster
-    password: "4KqaF+sqUa24yVi4mnqJW+A10JwiSjYZ1o2IWluG"
-    configs: {}
-    replicas: ""
-    adminRoute: "default"
-    conf: {}
-    env: {}
-  typeService:
-    name: type-service
-    class: ""
-    image: chipster-web-server-js
-    apiPort: 8010
-    adminPort: 8110
-    eventsPort: ""
-    workDir: /opt/chipster
-    password: "6YFMnxvUJP8bJcvrH47Q1wQ84WueosEReI5VKAyI"
-    configs: {}
-    replicas: ""
-    adminRoute: "default"
-    conf: {}
-    env: {}
-  singleShotComp:
-    name: single-shot-comp
-    apiPort: ""
-    adminPort: ""
-    password: ""
-    configs: {}
-    conf: {}
-    env: {}
+    password: XXXXXX
   backup:
-    name: backup
-    class: fi.csc.chipster.backup.Backup
-    image: chipster-web-server
-    apiPort: ""
-    adminPort: 8115
-    eventsPort: ""
-    workDir: /opt/chipster
-    password: "6fw6sZ9TyaZo/nlvfciJ1SBKPz7BPwaTGvh8hZiJ"
-    configs: {}
-    replicas: ""
-    adminRoute: "default"
-    conf: {}
-    env: {}
+    password: XXXXXX
+  fileBroker:
+    password: XXXXXX
+  fileStorage:
+    password: XXXXXX
   jobHistory:
-    name: job-history
-    class: fi.csc.chipster.jobhistory.JobHistoryService
-    image: chipster-web-server
-    apiPort: ""
-    adminPort: 8114
-    eventsPort: ""
-    workDir: /opt/chipster
-    password: "qlQsTxUZHP35fmGQTzTLu760+y/+cxNfs90r1uJr"
-    configs:
-    # db-fallback disables the use of an embedded H2 database if connection to Postgres fails
-    db-fallback-job-history: false
-    replicas: ""
-    adminRoute: "default"
-    conf: {}
-    env: {}
-
-deploymentDefault:
-  replicas: 1
-  adminRoute: "enable"
-  env: {}
-  livenessProbe:
-    periodSeconds: 10
-    timeoutSeconds: 1
-
-# databases is a section for Chipster scripts to know which databases exist
-# passwordKey is the YAML path where generate-passwords.bash will store the password
-# we can't store the password here, because Helm doesn't seem to have a way to rename the variable that is used in the postgresql subchart
-# names with dashes have to be quoted to work in jq
-databases:
-  auth:
-    passwordKey: "\"auth-postgresql\".postgresqlPassword"
-    enabled: true
-    hostPath: ""
+    password: XXXXXX
+  s3Storage:
+    password: XXXXXX
+  scheduler:
+    password: XXXXXX
+  serviceLocator:
+    password: XXXXXX
   sessionDb:
-    passwordKey: "\"session-db-postgresql\".postgresqlPassword"
-    enabled: true
-    hostPath: ""
-  jobHistory:
-    passwordKey: "\"job-history-postgresql\".postgresqlPassword"
-    enabled: true
-    hostPath: ""
-
-# generate-passwords.bash will generate all serviceAccounts.*.password fields
+    password: XXXXXX
+  sessionWorker:
+    password: XXXXXX
+  toolbox:
+    password: XXXXXX
+    configs:
+      toolbox-runtime-command-R-4.2.3-cellbender: /opt/chipster/tools/R-4.2.3/bin/R
+      toolbox-runtime-image-R-4.2.3-cellbender: comp-r-4-2-3-cellbender
+      toolbox-runtime-tools-bin-path-R-4.2.3-cellbender: tools-bin
+  typeService:
+    password: XXXXXX
+  webServer:
+    password: XXXXXX
 serviceAccounts:
   monitoring:
-    password: ""
-
-# generate-passwords.bash will generate all users.*.password fields
-users:
-  chipster:
-    password: ""
-  admin:
-    password: ""
-  example_session_owner:
-    password: ""
-  support_session_owner:
-    password: ""
-
-# generate-passwords.bash will generate all tokens.*.privateKey fields
-tokens:
-  auth:
-    privateKey:
-
-# Configure depenency subcharts
-
-# the key is the dependency alias in Chart.yaml
-# aliases use dashes by convention because they are used as Kubernetes names, but then we have to use the index function to access these values in templates
+    password: XXXXXX
 auth-postgresql:
-  # postgresqlDatabase is the name of the database
-  postgresqlDatabase: auth_db
-  # postgresqlPassword is the database password, see the comment of "databases" section 
-  postgresqlPassword: ""
-
-session-db-postgresql:
-  postgresqlDatabase: session_db_db
-  postgresqlPassword: ""
-
+  postgresqlPassword: XXXXXX
+  auth:
+    postgresPassword: XXXXXX
 job-history-postgresql:
-  postgresqlDatabase: job_history_db
-  postgresqlPassword: ""
-
-# image is a section for defining how to get the images
-image:
-  # localPullPolicy defines how to pull our own Chipster images TODO the name shouldn't be "local" I guess
-  localPullPolicy: IfNotPresent
-  #localPullPolicy: Never
-  chipsterImageRepo: docker-registry.rahti.csc.fi/chipster-images-release/
-  tag: latest
-
-# securityContext sets the access rights of the container user
-securityContext:
-  runAsNonRoot: true
-  runAsUser: 1000
-
-# capabilities:
-#   drop:
-#   - ALL
-# readOnlyRootFilesystem: true
-
-# podSecurityContext allows you set fsGroup: 0, if the file permissions prevent containers to modify volumes
-podSecurityContext: {}
-
-# host is the DNS name or IP address of the K3s host. The name or address must be accessible from the users' network. For OIDC and TLS (Let's Encrypt) this must be a DNS name.
-host: ""
-
-# toolsBin is a section for settings related to the tools-bin package
+  postgresqlPassword: XXXXXX
+  auth:
+    postgresPassword: XXXXXX
+session-db-postgresql:
+  postgresqlPassword: XXXXXX
+  auth:
+    postgresPassword: XXXXXX
+users:
+  admin:
+    password: XXXXXX
+  chipster:
+    password: XXXXXX
+  example_session_owner:
+    password: XXXXXX
+  support_session_owner:
+    password: XXXXXX
+  regan:
+    password: XXXXXX
+  phele:
+    password: XXXXXX
+  emma:
+    password: XXXXXX
+  maria:
+    password: XXXXXX
 toolsBin:
-  # version is the tools-bin package version
-  version: ""
-  # volumeSize is the size of the tools-bin volume
+  version: chipster-4.9.0
   volumeSize: 500Gi
-  # hostPath where from the tools-bin is mounted. By default it's mounted from the PVC.
-  hostPath: ""
+  hostPath: /mnt/data/chipster/tools-bin
 
 tools:
-  # hostPath where from tool scripts are mounted . By default the tools scripts from the image are used.
-  hostPath: ""
-  # manualHostPath where from manual pages are mounted . By default manual pages from the image are used.
-  manualHostPath: ""
-
-
-html:
-  # hostPath where from the html pages are mounted. By default html pages from the image are used.
-  hostPath: ""
-
-tls:
-  # env decides which Let's Encrypt environment to use. Set to "staging" to use the staging, "prod" to use the production, or "" to disable TLS.
-  env: ""
-  # email is the address where Let's Encrypt sends expiration notifications, when the automatic certificate renewal fails.
-  email: ""
-
-# ingress is section for the optional https configuration
-ingress:
-  kind: IngressRoute
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
-
-# resources are not used in the templates yet. We would need separate definitions for different kind of services
-resources: {}
-# We usually recommend not to specify default resources and to leave this as a conscious
-# choice for the user. This also increases chances charts run on environments with little
-# resources, such as Minikube. If you do want to specify resources, uncomment the following
-# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-# limits:
-#   cpu: 100m
-#   memory: 128Mi
-# requests:
-#   cpu: 100m
-#   memory: 128Mi
+  hostPath: /opt/chipster/toolbox/tools
+databases:
+  auth:
+    hostPath: "/mnt/data/auth-postgresql"
+  sessionDb:
+    hostPath: "/mnt/data/session-db-postgresql"
+  jobHistory:
+    hostPath: "/mnt/data/job-history-postgresql"
+tokens:
+  auth:
+    privateKey: |-
+      -----BEGIN EC PRIVATE KEY-----
+      XXXXXX
+      -----END EC PRIVATE KEY-----
